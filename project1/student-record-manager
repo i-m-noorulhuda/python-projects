@@ -1,0 +1,385 @@
+#-------Import Libraries------
+import tkinter as tk
+from tkinter import messagebox, ttk
+
+#-------Global Variables------
+students = []  # List to store all student records
+
+#-------Add Student Function------
+def add_student():
+    # Create a popup window to add student
+    popup = tk.Toplevel(root)
+    popup.title("Add Student")
+    popup.geometry("300x400")
+    popup.configure(bg="#FDEB9E")
+    
+    #-------Add Labels And Entries------
+    # Student ID
+    lbl_id = tk.Label(popup, text="Student ID", bg="#FDEB9E", fg="#06202B")
+    lbl_id.pack(pady=5)
+    entry_id = tk.Entry(popup, bg="#FFFFFF")
+    entry_id.pack(pady=5)
+
+    # Student Name
+    lbl_name = tk.Label(popup, text="Student Name", bg="#FDEB9E", fg="#06202B")
+    lbl_name.pack(pady=5)
+    entry_name = tk.Entry(popup, bg="#FFFFFF")
+    entry_name.pack(pady=5)
+
+    # Project
+    lbl_project = tk.Label(popup, text="Project", bg="#FDEB9E", fg="#06202B")
+    lbl_project.pack(pady=5)
+    entry_project = tk.Entry(popup, bg="#FFFFFF")
+    entry_project.pack(pady=5)
+
+    # Grade
+    lbl_grade = tk.Label(popup, text="Grade", bg="#FDEB9E", fg="#06202B")
+    lbl_grade.pack(pady=5)
+    entry_grade = tk.Entry(popup, bg="#FFFFFF")
+    entry_grade.pack(pady=5)
+    
+    #-------Save Function in Add Student---------
+    def save_data():
+        student_id = entry_id.get().strip()
+        name = entry_name.get().strip()
+        project = entry_project.get().strip()
+        grade = entry_grade.get().strip()
+        
+        # Validation
+        if not student_id or not name or not project or not grade:
+            messagebox.showerror("Error", "All fields are required!")
+            return
+        
+        # Dictionary For Saving Data
+        new_student = {
+            "ID": student_id,
+            "Student Name": name,
+            "Project": project,
+            "Grade": grade
+        }
+        
+        students.append(new_student)
+        messagebox.showinfo("Success", f"{name} added successfully!")
+        popup.destroy()
+    
+    #-------Save Button-------
+    btn_save = tk.Button(popup, text="Save", command=save_data, bg="#077A7D", fg="#FFFFFF", width=15)
+    btn_save.pack(pady=15)
+
+
+#-------View Student Function------
+def view_student():
+    # Check if any students exist
+    if not students:
+        messagebox.showinfo("No Students", "No students found!")
+        return
+    
+    # Create a new window
+    view_window = tk.Toplevel(root)
+    view_window.title("All Students")
+    view_window.geometry("550x400")
+    view_window.configure(bg="#FDEB9E")
+    
+    #-------Treeview Title-------
+    title_lbl = tk.Label(view_window, text="All Students List", font=("Arial", 14, "bold"), bg="#FDEB9E", fg="#06202B")
+    title_lbl.pack(pady=10)
+    
+    # Create treeview
+    tree = ttk.Treeview(view_window, columns=("ID", "Name", "Project", "Grade"), show="headings")
+    tree.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    #-------Treeview Headings-------
+    tree.heading("ID", text="Student ID")
+    tree.heading("Name", text="Name")
+    tree.heading("Project", text="Project")
+    tree.heading("Grade", text="Grade")
+    
+    #-------Treeview Column Widths-------
+    tree.column("ID", width=80, anchor="center")
+    tree.column("Name", width=150, anchor="center")
+    tree.column("Project", width=150, anchor="center")
+    tree.column("Grade", width=80, anchor="center")
+    
+    #-------Insert Data into Treeview-------
+    for student in students:
+        tree.insert("", "end", values=(
+            student["ID"], 
+            student["Student Name"], 
+            student["Project"], 
+            student["Grade"]
+        ))
+    
+    #-------Close Button-------
+    btn_close = tk.Button(view_window, text="Close", command=view_window.destroy, bg="#077A7D", fg="#FFFFFF", width=10)
+    btn_close.pack(pady=10)
+
+
+#-------Search Student Function------
+def search_student():
+    # Check if any students exist
+    if not students:
+        messagebox.showinfo("No Students", "No students to search!")
+        return
+    
+    # Create search window
+    search_window = tk.Toplevel(root)
+    search_window.title("Find Student")
+    search_window.geometry("300x250")
+    search_window.configure(bg="#FDEB9E")
+    
+    #-------Search Window Title-------
+    title_lbl = tk.Label(search_window, text="Search Student", bg="#FDEB9E", fg="#06202B", font=("Arial", 14, "bold"))
+    title_lbl.pack(pady=10)
+    
+    #-------Search by ID Function-------
+    def search_by_id():
+        search_window.destroy()
+        
+        # Create ID search window
+        id_window = tk.Toplevel(root)
+        id_window.title("Search by ID")
+        id_window.geometry("320x180")
+        id_window.configure(bg="#FDEB9E")
+        
+        tk.Label(id_window, text="Enter Student ID:", bg="#FDEB9E", fg="#06202B").pack(pady=10)
+        entry_id = tk.Entry(id_window, bg="#FFFFFF")
+        entry_id.pack(pady=5)
+        
+        def do_search():
+            search_id = entry_id.get().strip()
+            found = False
+            
+            for student in students:
+                if student["ID"] == search_id:
+                    # Create result window
+                    result_window = tk.Toplevel(id_window)
+                    result_window.title("Student Found")
+                    result_window.geometry("320x280")
+                    result_window.configure(bg="#FDEB9E")
+                    
+                    tk.Label(result_window, text="✓ STUDENT FOUND!", 
+                             font=("Arial", 14, "bold"), fg="#077A7D", bg="#FDEB9E").pack(pady=10)
+                    tk.Label(result_window, text=f"ID: {student['ID']}", bg="#FDEB9E", fg="#06202B").pack()
+                    tk.Label(result_window, text=f"Name: {student['Student Name']}", bg="#FDEB9E", fg="#06202B").pack()
+                    tk.Label(result_window, text=f"Project: {student['Project']}", bg="#FDEB9E", fg="#06202B").pack()
+                    tk.Label(result_window, text=f"Grade: {student['Grade']}", bg="#FDEB9E", fg="#06202B").pack()
+                    
+                    btn_close = tk.Button(result_window, text="Close", command=result_window.destroy, bg="#077A7D", fg="#FFFFFF")
+                    btn_close.pack(pady=15)
+                    
+                    found = True
+                    break
+            
+            if not found:
+                messagebox.showerror("Not Found", f"No student found with ID: {search_id}")
+                id_window.destroy()
+        
+        btn_search = tk.Button(id_window, text="Search", command=do_search, bg="#077A7D", fg="#FFFFFF", width=12)
+        btn_search.pack(pady=10)
+    
+    #-------Search by Name Function-------
+    def search_by_name():
+        search_window.destroy()
+        
+        # Create Name search window
+        name_window = tk.Toplevel(root)
+        name_window.title("Search by Name")
+        name_window.geometry("320x180")
+        name_window.configure(bg="#FDEB9E")
+        
+        tk.Label(name_window, text="Enter Student Name:", bg="#FDEB9E", fg="#06202B").pack(pady=10)
+        entry_name = tk.Entry(name_window, bg="#FFFFFF")
+        entry_name.pack(pady=5)
+        
+        def do_search():
+            search_name = entry_name.get().strip().lower()
+            found = False
+            
+            for student in students:
+                if student["Student Name"].lower() == search_name:
+                    # Create result window
+                    result_window = tk.Toplevel(name_window)
+                    result_window.title("Student Found")
+                    result_window.geometry("320x280")
+                    result_window.configure(bg="#FDEB9E")
+                    
+                    tk.Label(result_window, text="✓ STUDENT FOUND!", 
+                             font=("Arial", 14, "bold"), fg="#077A7D", bg="#FDEB9E").pack(pady=10)
+                    tk.Label(result_window, text=f"ID: {student['ID']}", bg="#FDEB9E", fg="#06202B").pack()
+                    tk.Label(result_window, text=f"Name: {student['Student Name']}", bg="#FDEB9E", fg="#06202B").pack()
+                    tk.Label(result_window, text=f"Project: {student['Project']}", bg="#FDEB9E", fg="#06202B").pack()
+                    tk.Label(result_window, text=f"Grade: {student['Grade']}", bg="#FDEB9E", fg="#06202B").pack()
+                    
+                    btn_close = tk.Button(result_window, text="Close", command=result_window.destroy, bg="#077A7D", fg="#FFFFFF")
+                    btn_close.pack(pady=15)
+                    
+                    found = True
+                    break
+            
+            if not found:
+                messagebox.showerror("Not Found", f"No student found with name: {search_name}")
+                name_window.destroy()
+        
+        btn_search = tk.Button(name_window, text="Search", command=do_search, bg="#077A7D", fg="#FFFFFF", width=12)
+        btn_search.pack(pady=10)
+    
+    #-------Search Window Buttons-------
+    btn_id = tk.Button(search_window, text="Search by ID", width=18, command=search_by_id, bg="#077A7D", fg="#FFFFFF")
+    btn_id.pack(pady=8)
+    
+    btn_name = tk.Button(search_window, text="Search by Name", width=18, command=search_by_name, bg="#077A7D", fg="#FFFFFF")
+    btn_name.pack(pady=8)
+    
+    btn_cancel = tk.Button(search_window, text="Cancel", width=18, command=search_window.destroy, bg="#e74c3c", fg="#FFFFFF")
+    btn_cancel.pack(pady=8)
+
+
+#-------Delete Student Function------
+def delete_student():
+    # Check if any students exist
+    if not students:
+        messagebox.showinfo("No Students", "No students to delete!")
+        return
+    
+    # Create delete window
+    delete_window = tk.Toplevel(root)
+    delete_window.title("Delete Student")
+    delete_window.geometry("300x250")
+    delete_window.configure(bg="#FDEB9E")
+    
+    #-------Delete Window Title-------
+    title_lbl = tk.Label(delete_window, text="Delete Student", bg="#FDEB9E", fg="#06202B", font=("Arial", 14, "bold"))
+    title_lbl.pack(pady=10)
+    
+    #-------Delete by ID Function-------
+    def delete_by_id():
+        delete_window.destroy()
+        
+        # Create ID delete window
+        id_window = tk.Toplevel(root)
+        id_window.title("Delete by ID")
+        id_window.geometry("320x150")
+        id_window.configure(bg="#FDEB9E")
+        
+        tk.Label(id_window, text="Enter Student ID to delete:", bg="#FDEB9E", fg="#06202B").pack(pady=10)
+        entry_id = tk.Entry(id_window, bg="#FFFFFF")
+        entry_id.pack(pady=5)
+        
+        def do_delete():
+            delete_id = entry_id.get().strip()
+            found = False
+            
+            for student in students:
+                if student["ID"] == delete_id:
+                    # Confirm before deleting
+                    confirm = messagebox.askyesno("Confirm Delete", f"Delete {student['Student Name']}?")
+                    if confirm:
+                        students.remove(student)
+                        messagebox.showinfo("Deleted", f"Student with ID {delete_id} deleted!")
+                    found = True
+                    id_window.destroy()
+                    break
+            
+            if not found:
+                messagebox.showerror("Not Found", f"No student found with ID: {delete_id}")
+                id_window.destroy()
+        
+        btn_delete = tk.Button(id_window, text="Delete", command=do_delete, bg="#e74c3c", fg="#FFFFFF", width=12)
+        btn_delete.pack(pady=10)
+    
+    #-------Delete by Name Function-------
+    def delete_by_name():
+        delete_window.destroy()
+        
+        # Create Name delete window
+        name_window = tk.Toplevel(root)
+        name_window.title("Delete by Name")
+        name_window.geometry("320x150")
+        name_window.configure(bg="#FDEB9E")
+        
+        tk.Label(name_window, text="Enter Student Name to delete:", bg="#FDEB9E", fg="#06202B").pack(pady=10)
+        entry_name = tk.Entry(name_window, bg="#FFFFFF")
+        entry_name.pack(pady=5)
+        
+        def do_delete():
+            delete_name = entry_name.get().strip().lower()
+            found = False
+            
+            for student in students:
+                if student["Student Name"].lower() == delete_name:
+                    confirm = messagebox.askyesno("Confirm Delete", f"Delete {student['Student Name']}?")
+                    if confirm:
+                        students.remove(student)
+                        messagebox.showinfo("Deleted", f"Student {delete_name} deleted!")
+                    found = True
+                    name_window.destroy()
+                    break
+            
+            if not found:
+                messagebox.showerror("Not Found", f"No student found with name: {delete_name}")
+                name_window.destroy()
+        
+        btn_delete = tk.Button(name_window, text="Delete", command=do_delete, bg="#e74c3c", fg="#FFFFFF", width=12)
+        btn_delete.pack(pady=10)
+    
+    #-------Delete Window Buttons-------
+    btn_id = tk.Button(delete_window, text="Delete by ID", width=18, command=delete_by_id, bg="#077A7D", fg="#FFFFFF")
+    btn_id.pack(pady=8)
+    
+    btn_name = tk.Button(delete_window, text="Delete by Name", width=18, command=delete_by_name, bg="#077A7D", fg="#FFFFFF")
+    btn_name.pack(pady=8)
+    
+    btn_cancel = tk.Button(delete_window, text="Cancel", width=18, command=delete_window.destroy, bg="#e74c3c", fg="#FFFFFF")
+    btn_cancel.pack(pady=8)
+
+
+#-------Main Window Setup------
+root = tk.Tk()
+root.title("Student Manager")
+root.geometry("450x550")
+root.configure(bg="#06202B")
+
+#-------Window Title------
+title_label = tk.Label(root, text="📚 Student Manager", font=("Arial", 22, "bold"))
+title_label.pack(pady=25)
+title_label.configure(fg="#FDEB9E", bg="#06202B")
+
+#-------Main Menu Buttons------
+# Add Student Button
+btn_add = tk.Button(root, text="➕ Add Student", fg="#FFFFFF", font=("Arial", 11, "bold"), 
+                    width=22, command=add_student)
+btn_add.pack(pady=8)
+btn_add.configure(bg="#27ae60")
+
+# View Student Button
+btn_view = tk.Button(root, text="👁️ View Students", fg="#FFFFFF", font=("Arial", 11, "bold"), 
+                     width=22, command=view_student)
+btn_view.pack(pady=8)
+btn_view.configure(bg="#077A7D")
+
+# Search Student Button
+btn_search = tk.Button(root, text="🔍 Search Student", fg="#FFFFFF", font=("Arial", 11, "bold"), 
+                       width=22, command=search_student)
+btn_search.pack(pady=8)
+btn_search.configure(bg="#7AE2CF")
+btn_search.configure(fg="#06202B")
+
+# Delete Student Button
+btn_delete = tk.Button(root, text="🗑️ Delete Student", fg="#FFFFFF", font=("Arial", 11, "bold"), 
+                       width=22, command=delete_student)
+btn_delete.pack(pady=8)
+btn_delete.configure(bg="#e74c3c")
+
+# Exit Button
+btn_exit = tk.Button(root, text="🚪 Exit", fg="#FFFFFF", font=("Arial", 11, "bold"), 
+                     width=22, command=root.quit)
+btn_exit.pack(pady=8)
+btn_exit.configure(bg="#06202B")
+
+#-------Footer------
+footer_lbl = tk.Label(root, text="Student Management System", font=("Arial", 8), 
+                      bg="#06202B", fg="#7AE2CF")
+footer_lbl.pack(side="bottom", pady=10)
+
+#-------Run Main Loop------
+root.mainloop()
